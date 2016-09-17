@@ -4,6 +4,7 @@ import json
 import time
 import os
 import re
+# import subprocess
 
 __version__ = '0.0.3'
 memory_prefix_mapping = {'': 'memory_usage', 'kmem': 'kernel_memory_usage', 'memsw': 'swap_memory_usage'}
@@ -165,6 +166,7 @@ def get_metrics(alias, subsystem, path):
         ret = {
             '%s.cpu.share' % alias: read_first_line(os.path.join(path, 'cpu.shares')),
             '%s.cpu.cfs_quota_us' % alias: read_first_line(os.path.join(path, 'cpu.cfs_quota_us')),
+            '%s.cpu.cfs_period_us' % alias: read_first_line(os.path.join(path, 'cpu.cfs_period_us')),
         }
         return ret
     if subsystem == 'cpuset':
@@ -197,6 +199,8 @@ def get_metrics(alias, subsystem, path):
             ret['%s.%s' % (alias, max_usage_file)] = read_first_line(os.path.join(path, max_usage_file))
             ret['%s.%s' % (alias, failcnt_file)] = read_first_line(os.path.join(path, failcnt_file))
             ret['%s.%s' % (alias, total_bytes)] = read_first_line(os.path.join(path, total_bytes))
+        # soft limit
+        ret['%s.memory.soft_limit_in_bytes' % alias] = read_first_line(os.path.join(path, 'memory.soft_limit_in_bytes'))
 
         return ret
     if subsystem == 'blkio':
@@ -302,9 +306,6 @@ def main(opts):
             format(metrics, format=opts.format, prefix=opts.prefix)
 
     if opts.disk:
-        raise NotImplementedError('Would be implemented in next release.')
-    
-    if opts.network:
         raise NotImplementedError('Would be implemented in next release.')
 
 
